@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ақпараттық бот</title>
+  <!-- Подключение скрипта Telegram WebApp -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--tg-theme-bg-color, #18222d);
+      color: var(--tg-theme-text-color, #ffffff);
+      box-sizing: border-box;
+    }
+
+    .welcome-card {
+      background-color: var(--tg-theme-secondary-bg-color, #212d3b);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-left: 4px solid var(--tg-theme-button-color, #2481cc);
+    }
+
+    .welcome-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .welcome-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--tg-theme-hint-color, #a2b0c1);
+    }
+
+    .menu-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--tg-theme-hint-color, #7f91a4);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-btn {
+      background-color: var(--tg-theme-secondary-bg-color, #212d3b);
+      color: var(--tg-theme-text-color, #ffffff);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .menu-btn:active {
+      transform: scale(0.98);
+      background-color: var(--tg-theme-button-color, #2481cc);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+
+    .btn-icon {
+      font-size: 22px;
+    }
+
+    .content-section {
+      display: none;
+      background-color: var(--tg-theme-secondary-bg-color, #212d3b);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 10px;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--tg-theme-button-color, #2481cc);
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Приветственное сообщение -->
+  <div class="welcome-card" id="welcome-box">
+    <div class="welcome-title">Сәлеметсіз бе! 👋</div>
+    <div class="welcome-text">
+      Бұл ботта сіз:<br>
+      📅 <b>Сабақ кестесін</b><br>
+      🔔 <b>Қоңыраулар уақытын</b><br>
+      🍕 <b>Асханадағы бағаларды</b> қарай аласыз! ✨
+    </div>
+  </div>
+
+  <!-- Главное меню -->
+  <div id="main-menu">
+    <div class="menu-title">Бөлімді таңдаңыз:</div>
+    <div class="menu-grid">
+      <button class="menu-btn" onclick="openSection('schedule')">
+        <span class="btn-icon">📅</span>
+        <span>Сабақ кестесі</span>
+      </button>
+
+      <button class="menu-btn" onclick="openSection('bells')">
+        <span class="btn-icon">🔔</span>
+        <span>Қоңыраулар уақыты</span>
+      </button>
+
+      <button class="menu-btn" onclick="openSection('canteen')">
+        <span class="btn-icon">🍕</span>
+        <span>Асханадағы бағалар</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Раздел: Сабақ кестесі -->
+  <div id="schedule" class="content-section">
+    <button class="back-btn" onclick="showMenu()">← Артқа қайту</button>
+    <h2>📅 Сабақ кестесі</h2>
+    <p>Осы жерге сабақ кестесін жазасыз (мысалы: Дүйсенбі, Сейсенбі...)</p>
+  </div>
+
+  <!-- Раздел: Қоңыраулар уақыты -->
+  <div id="bells" class="content-section">
+    <button class="back-btn" onclick="showMenu()">← Артқа қайту</button>
+    <h2>🔔 Қоңыраулар уақыты</h2>
+    <p>1-сабақ: 08:00 - 08:45<br>2-сабақ: 08:50 - 09:35...</p>
+  </div>
+
+  <!-- Раздел: Асханадағы бағалар -->
+  <div id="canteen" class="content-section">
+    <button class="back-btn" onclick="showMenu()">← Артқа қайту</button>
+    <h2>🍕 Асханадағы бағалар</h2>
+    <p>Пицца — 350 ₸<br>Бәліш — 200 ₸<br>Шай — 100 ₸</p>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function openSection(sectionId) {
+      document.getElementById('welcome-box').style.display = 'none';
+      document.getElementById('main-menu').style.display = 'none';
+      
+      const sections = document.querySelectorAll('.content-section');
+      sections.forEach(sec => sec.classList.remove('active'));
+      
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    function showMenu() {
+      const sections = document.querySelectorAll('.content-section');
+      sections.forEach(sec => sec.classList.remove('active'));
+      
+      document.getElementById('welcome-box').style.display = 'block';
+      document.getElementById('main-menu').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
